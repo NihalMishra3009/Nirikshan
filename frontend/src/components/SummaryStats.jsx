@@ -1,10 +1,12 @@
-function SummaryStats() {
+function SummaryStats({ data }) {
+  if (!data) return null;
+
   return (
     <div className="section-card">
-      <h2>Summary Statistics</h2>
-      <p>Mean: --</p>
-      <p>Max: --</p>
-      <p>Min: --</p>
+      <div className="section-title">Statistical Summary</div>
+      <p>Mean: {data.summary_stats.mean}</p>
+      <p>Max: {data.summary_stats.max}</p>
+      <p>Min: {data.summary_stats.min}</p>
     </div>
   );
 }

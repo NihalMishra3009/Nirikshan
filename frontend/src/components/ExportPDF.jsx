@@ -1,7 +1,9 @@
 function ExportPDF() {
   return (
     <div className="section-card">
-      <button>Download PDF</button>
+      <div className="section-title">Export</div>
+
+      <button>Download Full Report</button>
     </div>
   );
 }

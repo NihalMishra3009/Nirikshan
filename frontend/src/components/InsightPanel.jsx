@@ -1,9 +1,11 @@
-function InsightPanel() {
+function InsightPanel({ data }) {
   return (
     <div className="section-card">
-      <h2>Insights</h2>
+      <div className="section-title">Generated Insights</div>
       <ul>
-        <li>No insights yet.</li>
+        {data.insights.map((insight, index) => (
+          <li key={index}>{insight}</li>
+        ))}
       </ul>
     </div>
   );

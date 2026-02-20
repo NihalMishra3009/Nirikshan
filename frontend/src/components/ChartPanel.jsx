@@ -1,10 +1,31 @@
-function ChartPanel() {
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid
+} from "recharts";
+
+function ChartPanel({ data }) {
+  const chart = data.recommended_chart;
+
   return (
     <div className="section-card">
-      <h2>Chart Visualization</h2>
-      <div style={{ height: "250px", backgroundColor: "#f2f2f2" }}>
-        Chart will appear here
-      </div>
+      <div className="section-title">Recommended Chart</div>
+
+      <LineChart width={600} height={300} data={chart.data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={chart.x} />
+        <YAxis />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey={chart.y}
+          stroke="#01257D"
+          strokeWidth={3}
+        />
+      </LineChart>
     </div>
   );
 }
