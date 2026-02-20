@@ -1,60 +1,60 @@
 import { useState } from "react";
+import axios from "axios";
 import Upload from "../components/Upload";
 import AuditPanel from "../components/AuditPanel";
 import SummaryStats from "../components/SummaryStats";
 import ChartPanel from "../components/ChartPanel";
 import InsightPanel from "../components/InsightPanel";
-import ExportPDF from "../components/ExportPDF";
+import SchemaPanel from "../components/SchemaPanel";
 
 function Dashboard() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    if (!selectedFile) return;
+
     setIsAnalyzing(true);
+    setError("");
+    setLoadingMessage("Uploading and analyzing dataset...");
 
-    setTimeout(() => {
-      setAnalysisData({
-        schema: {
-          numeric_columns: ["sales"],
-          categorical_columns: ["state"],
-          date_columns: ["year"]
-        },
-        audit_report: {
-          missing_percentage: "2%",
-          duplicate_rows: 1
-        },
-        summary_stats: {
-          mean: 245,
-          max: 500,
-          min: 100
-        },
-        recommended_chart: {
-          type: "line",
-          x: "year",
-          y: "sales",
-          data: [
-            { year: 2020, sales: 200 },
-            { year: 2021, sales: 300 },
-            { year: 2022, sales: 450 }
-          ]
-        },
-        insights: [
-          "Sales show consistent upward growth.",
-          "2022 recorded the highest value.",
-          "Minor missing data detected."
-        ]
-      });
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
 
+      const response = await axios.post(
+        "http://localhost:8000/analyze",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (response.data.error) {
+        setError(response.data.error);
+        setIsAnalyzing(false);
+        return;
+      }
+
+      setAnalysisData(response.data);
       setIsAnalyzing(false);
-    }, 800);
+
+    } catch (err) {
+      setError("Server error. Please check backend.");
+      setIsAnalyzing(false);
+    }
   };
 
   return (
     <div className="app-container">
       {analysisData === null ? (
         <div className="hero-layout">
+
           <div className="hero-left">
             <h1 className="brand-main">NIRIKSHAN</h1>
             <div className="hero-accent"></div>
@@ -74,6 +74,7 @@ function Dashboard() {
               <div className="action-card">
                 <div className="file-label">Selected File</div>
                 <div className="file-name">{selectedFile.name}</div>
+
                 <button
                   className="generate-button"
                   onClick={handleGenerate}
@@ -86,18 +87,35 @@ function Dashboard() {
             {isAnalyzing && (
               <div className="loading-section">
                 <div className="spinner"></div>
-                <p>Analyzing dataset...</p>
+                <p>{loadingMessage}</p>
+              </div>
+            )}
+
+            {error && (
+              <div style={{ marginTop: "20px", color: "red" }}>
+                {error}
               </div>
             )}
           </div>
         </div>
       ) : (
         <div className="dashboard-content">
-          <AuditPanel data={analysisData} />
-          <SummaryStats data={analysisData} />
-          <ChartPanel data={analysisData} />
-          <InsightPanel data={analysisData} />
-          <ExportPDF />
+
+          <div className="top-row">
+            <AuditPanel data={analysisData} />
+            <SummaryStats data={analysisData} />
+          </div>
+
+          <SchemaPanel data={analysisData} />
+
+          <div className="chart-row">
+            <ChartPanel data={analysisData} />
+          </div>
+
+          <div className="insight-row">
+            <InsightPanel data={analysisData} />
+          </div>
+
         </div>
       )}
     </div>
