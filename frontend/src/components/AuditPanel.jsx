@@ -1,9 +1,9 @@
-function AuditPanel() {
+function AuditPanel({ data }) {
   return (
     <div className="section-card">
-      <h2>Data Health Report</h2>
-      <p>Missing Values: --</p>
-      <p>Duplicate Rows: --</p>
+      <div className="section-title">Data Quality Audit</div>
+      <p>Missing Values: {data.audit_report.missing_percentage}</p>
+      <p>Duplicate Rows: {data.audit_report.duplicate_rows}</p>
     </div>
   );
 }
